@@ -67,36 +67,45 @@
         </div>
   
         <div class="modal-body p-5 pt-0">
-          <form class="">
-            <div class="form-floating mb-3">
+          <form class="" action="/sign/" method="post">
+            {% csrf_token %}
+            <!-- <div class="form-floating mb-3">
               <input type="text" class="form-control rounded-3" id="floatingInput" placeholder="身分證字號">
               <label for="floatingInput">身分證字號</label>
+            </div> -->
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="uname" name="uname" placeholder="姓名(暱稱)">
+              <label for="uname">姓名(暱稱)</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="text" class="form-control rounded-3" id="floatingInput" placeholder="姓名(暱稱)">
-              <label for="floatingInput">姓名(暱稱)</label>
+              <input type="text" class="form-control rounded-3" id="uphone" name="uphone" placeholder="手機號碼">
+              <label for="uphone">手機號碼</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="text" class="form-control rounded-3" id="floatingInput" placeholder="手機號碼">
-              <label for="floatingInput">手機號碼</label>
+              <input type="password" class="form-control rounded-3" id="upwd" name="upwd" placeholder="密碼">
+              <label for="upwd">密碼</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="password" class="form-control rounded-3" id="floatingPassword" placeholder="密碼">
-              <label for="floatingPassword">密碼</label>
-            </div>
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control rounded-3" id="floatingPassword" placeholder="確認密碼">
-              <label for="floatingPassword">確認密碼</label>
+              <input type="password" class="form-control rounded-3" id="upwd2" name="upwd2" placeholder="確認密碼">
+              <label for="upwd2">確認密碼</label>
             </div>
             <div class="btn_center">
                 <button type="submit" class="btn btn-outline-success">註冊</button>
-                <a href="../login/">
+                <a href="../signup/">
                   <button type="button" class="btn btn-outline-secondary">返回</button>
                 </a>
             </div>
             <p></p>
             <small class="text-muted">歡迎使用碳治郎系統，若您已經擁有帳號，請點擊返回按鈕登入會員。</small>
           </form>
+        {% if messages %}
+        <script>
+        {% for msg in messages %}
+            alert('{{ msg.message }}');
+        {% endfor %}
+        </script>
+        {% endif %}
+
         </div>
       </div>
       <div class="text-center">

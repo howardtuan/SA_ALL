@@ -29,7 +29,9 @@ urlpatterns = [
     path('member/',views.member_view),
     path('myself/',views.myself_view),
     path('question/',views.question_view),
-    path('signup/',views.signup_view)
+    path('signup/',views.signup_view),
+    path('sign/', views.signup),
+    path('login_process/', views.login),
     # path(r'^admin/', admin.site.urls),
     # path(r'^$', sayhello),
 ]
