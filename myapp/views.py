@@ -24,38 +24,25 @@ def index_view(request):
     user_name=user.NAME
     user_point=user.POINT
     user_barcode=user.PHONE_NUMBER
-    return render(request, 'index.html', {
-        'user_name':user_name,
-        'user_point':user_point,
-        'user_barcode':user_barcode,
-    } )
+    return render(request, 'index.html', locals())
 def apps_view(request):
-    return render(request, 'orthers_app.html', {
-    } )
+    return render(request, 'orthers_app.html', locals())
 def exchange_view(request):
-    return render(request, 'exchange.html', {
-    } )
+    return render(request, 'exchange.html', locals())
 def fix_view(request):
-    return render(request, 'fix.html', {
-    } )
+    return render(request, 'fix.html', locals())
 def history_view(request):
-    return render(request, 'history.html', {
-    } )
+    return render(request, 'history.html', locals())
 def login_view(request):
-    return render(request, 'login.html', {
-    } )
+    return render(request, 'login.html', locals())
 def member_view(request):
-    return render(request, 'member.html', {
-    } )
+    return render(request, 'member.html', locals())
 def myself_view(request):
-    return render(request, 'myself.html', {
-    } )
+    return render(request, 'myself.html', locals())
 def question_view(request):
-    return render(request, 'question.html', {
-    } )
+    return render(request, 'question.html', locals())
 def signup_view(request):
-    return render(request, 'signup.html', {
-    } )
+    return render(request, 'signup.html', locals())
 
 #註冊
 def signup(request):
@@ -72,22 +59,20 @@ def signup(request):
     count = client.objects.filter(PHONE_NUMBER=newphone).count()
     if count!=0:
         messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
-        return render(request, 'signup.html',{})
+        return render(request, 'signup.html',locals())
     messages.error(request, '註冊成功！')  
     client.objects.create(NAME=request.POST.get('uname'),PHONE_NUMBER=request.POST.get('uphone'),PASSWORD=request.POST.get('upwd'),POINT=0)
-    return render(request, 'login.html',{})
+    return render(request, 'login.html',locals())
 #登入
 def login(request):
     count = client.objects.filter(PHONE_NUMBER=request.POST['uphone']).count()
     if count==0:
         messages.error(request, '帳號或密碼錯誤')  
-        return render(request, 'login.html', {
-    } )
+        return render(request, 'login.html', locals())
     m = client.objects.get(PHONE_NUMBER=request.POST['uphone'])
     if m.PASSWORD != request.POST['upwd']:
         messages.error(request, '帳號或密碼錯誤')  
-        return render(request, 'login.html', {
-    } )
+        return render(request, 'login.html', locals())
     else: 
         return HttpResponseRedirect('/index/')
 #登入帳號語法
