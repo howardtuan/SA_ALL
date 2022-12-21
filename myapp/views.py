@@ -6,25 +6,30 @@ from django.urls import reverse
 from myapp.models import client
 from django.http import Http404
 from django.contrib import auth,messages
+from django.contrib.auth.models import User
 # from django.shortcuts import get_object_or_404, get_list_or_404 # 快捷函数
 
 # Create your views here.
 
 
 def main(request):
-    return render(request, 'index.html', {
-        'user_name':"none",
-        'user_point':"none",
-        'user_barcode':"none",
-    } )
-    
-def index_view(request):
-    account="888"
-    user=client.objects.get(PHONE_NUMBER=account)
-    user_name=user.NAME
-    user_point=user.POINT
-    user_barcode=user.PHONE_NUMBER
+    if request.user.is_authenticated:
+        user_name = request.user
+        
     return render(request, 'index.html', locals())
+
+def index_view(request):
+    if request.user.is_authenticated:
+        # account = "888"
+        account = request.user
+        user=client.objects.get(PHONE_NUMBER = account)
+        user_name=user.NAME
+        user_point=user.POINT
+        user_barcode=user.PHONE_NUMBER
+    user_name = request.user.get_username()
+    print(request.user)
+    return render(request, 'index.html', locals())
+
 def apps_view(request):
     return render(request, 'orthers_app.html', locals())
 def exchange_view(request):
@@ -44,6 +49,9 @@ def question_view(request):
 def signup_view(request):
     return render(request, 'signup.html', locals())
 
+def logout(request):
+    auth.logout(request)
+
 #註冊
 def signup(request):
     if(request.POST.get('upwd')!=request.POST.get('upwd2')):
@@ -60,21 +68,33 @@ def signup(request):
     if count!=0:
         messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
         return render(request, 'signup.html',locals())
-    messages.error(request, '註冊成功！')  
-    client.objects.create(NAME=request.POST.get('uname'),PHONE_NUMBER=request.POST.get('uphone'),PASSWORD=request.POST.get('upwd'),POINT=0)
+    messages.error(request, '註冊成功！')
+    User.objects.create_user(username = request.POST.get('uphone'), password = request.POST.get('upwd')) # 驗證的資料庫
+    client.objects.create(NAME = request.POST.get('uname'),PHONE_NUMBER=request.POST.get('uphone'),PASSWORD=request.POST.get('upwd'),POINT=0)
     return render(request, 'login.html',locals())
+
 #登入
 def login(request):
-    count = client.objects.filter(PHONE_NUMBER=request.POST['uphone']).count()
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/index/')
+    count = client.objects.filter(PHONE_NUMBER = request.POST['uphone']).count()
     if count==0:
         messages.error(request, '帳號或密碼錯誤')  
         return render(request, 'login.html', locals())
-    m = client.objects.get(PHONE_NUMBER=request.POST['uphone'])
+    m = client.objects.get(PHONE_NUMBER = request.POST['uphone'])
     if m.PASSWORD != request.POST['upwd']:
         messages.error(request, '帳號或密碼錯誤')  
         return render(request, 'login.html', locals())
-    else: 
+    username = request.POST.get('uphone', '')
+    password = request.POST.get('upwd', '')
+    user = auth.authenticate(username = username, password = password)
+    print(user)
+    if user is not None and user.is_active:
+        auth.login(request, user)
         return HttpResponseRedirect('/index/')
+    else:
+        return render(request, 'login.html', locals())
+
 #登入帳號語法
 def logintest(request):
     if request.user.is_authenticated:
