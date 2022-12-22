@@ -14,43 +14,92 @@ from django.contrib.auth.models import User
 
 def main(request):
     if request.user.is_authenticated:
-        user_name = request.user
-        
+        # account = "888"
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_name=user.NAME
+        user_point=user.POINT
+        user_barcode=user.PHONE_NUMBER
     return render(request, 'index.html', locals())
 
 def index_view(request):
     if request.user.is_authenticated:
         # account = "888"
         account = request.user
-        user=client.objects.get(PHONE_NUMBER = account)
+        user = client.objects.get(PHONE_NUMBER = account)
         user_name=user.NAME
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
-    user_name = request.user.get_username()
-    print(request.user)
     return render(request, 'index.html', locals())
+
 
 def apps_view(request):
     return render(request, 'orthers_app.html', locals())
+
 def exchange_view(request):
     return render(request, 'exchange.html', locals())
+
+# 修改會員資料
 def fix_view(request):
-    return render(request, 'fix.html', locals())
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_name=user.NAME
+        user_point=user.POINT
+        user_barcode=user.PHONE_NUMBER
+        return render(request, 'fix.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
+
+def fix(request):
+    if(request.POST.get('password')!=request.POST.get('double_check')):
+        messages.error(request, '密碼輸入不一致，請重新輸入')  
+        return render(request, 'fix.html',locals())
+    user_name = request.POST.get('username')
+    user_phone = request.POST.get("user_phone")
+    user_password = request.POST.get('user_password')
+    client.objects.filter(PHONE_NUMBER = request.user).update(NAME = user_name, PHONE_NUMBER = user_phone, PASSWORD = user_password)
+    User.objects.filter(user_name = request.user).update(user_name = user_phone, password = user_password)
+    user = auth.authenticate(username = user_phone, password = user_password)
+    auth.login(request, user)
+    messages.error(request, '會員資料已更新')
+    return HttpResponseRedirect("/member/")
+
 def history_view(request):
-    return render(request, 'history.html', locals())
+    if request.user.is_authenticated:
+        return render(request, 'history.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
+
 def login_view(request):
     return render(request, 'login.html', locals())
+
 def member_view(request):
-    return render(request, 'member.html', locals())
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_name=user.NAME
+        user_point=user.POINT
+        user_barcode=user.PHONE_NUMBER
+        return render(request, 'member.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
+
 def myself_view(request):
     return render(request, 'myself.html', locals())
+
 def question_view(request):
     return render(request, 'question.html', locals())
+
 def signup_view(request):
     return render(request, 'signup.html', locals())
 
 def logout(request):
     auth.logout(request)
+    return HttpResponseRedirect('/index/')
 
 #註冊
 def signup(request):
@@ -88,7 +137,6 @@ def login(request):
     username = request.POST.get('uphone', '')
     password = request.POST.get('upwd', '')
     user = auth.authenticate(username = username, password = password)
-    print(user)
     if user is not None and user.is_active:
         auth.login(request, user)
         return HttpResponseRedirect('/index/')

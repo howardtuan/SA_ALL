@@ -45,14 +45,19 @@
           <li class="nav-item">
             <a class="nav-link" href="../question/">問題回報</a>
           </li>
+        
+          <!--登入後才會出現的登出按鈕-->
+          {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="../logout/">登出</a>
+            <!-- <button type="submit" style="border: 0;background: #f8f9fa; margin-left: -5px; color:#6c757d"> -->
+          </li>
+          <!--/登入後才會出現的登出按鈕-->
+          {% else %}
           <li class="nav-item">
             <a class="nav-link" href="../login/">登入/註冊</a>
           </li>
-          <!--登入後才會出現的登出按鈕-->
-          <!-- <li class="nav-item">
-            <a class="nav-link" href="#"><button type="submit" style="border: 0;background: #f8f9fa; margin-left: -5px; color:#6c757d">登出</button></a>
-          </li> -->
-          <!--/登入後才會出現的登出按鈕-->
+          {% endif %}
         </ul>
       </div>
     </div>
