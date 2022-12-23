@@ -120,13 +120,15 @@ def signup(request):
     messages.error(request, '註冊成功！')
     User.objects.create_user(username = request.POST.get('uphone'), password = request.POST.get('upwd')) # 驗證的資料庫
     client.objects.create(NAME = request.POST.get('uname'),PHONE_NUMBER=request.POST.get('uphone'),PASSWORD=request.POST.get('upwd'),POINT=0)
-    return render(request, 'login.html',locals())
+    return HttpResponseRedirect('/login/')
 
 #登入
 def login(request):
     if request.user.is_authenticated:
+        print("is auth")
         return HttpResponseRedirect('/index/')
     count = client.objects.filter(PHONE_NUMBER = request.POST['uphone']).count()
+    print("count",count)
     if count==0:
         messages.error(request, '帳號或密碼錯誤')  
         return render(request, 'login.html', locals())
@@ -135,10 +137,17 @@ def login(request):
         messages.error(request, '帳號或密碼錯誤')  
         return render(request, 'login.html', locals())
     username = request.POST.get('uphone', '')
+    print(username)
     password = request.POST.get('upwd', '')
+    print(password)
     user = auth.authenticate(username = username, password = password)
+    print(user)
     if user is not None and user.is_active:
+        print(user)
+        print('user.is_active')
         auth.login(request, user)
         return HttpResponseRedirect('/index/')
     else:
+        print(user)
+        print('user.n_active')
         return render(request, 'login.html', locals())
