@@ -142,16 +142,3 @@ def login(request):
         return HttpResponseRedirect('/index/')
     else:
         return render(request, 'login.html', locals())
-
-#登入帳號語法
-def logintest(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/index/')
-    username = request.POST.get('username', '')
-    password = request.POST.get('password', '')
-    user = auth.authenticate(username=username, password=password)
-    if user is not None and user.is_active:
-        auth.login(request, user)
-        return HttpResponseRedirect('/index/')
-    else:
-        return render(request, 'login.html', locals())
