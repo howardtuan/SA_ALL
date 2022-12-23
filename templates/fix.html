@@ -75,7 +75,7 @@
           <form class="" action = "/fix_proccess/" method = "post">
             {% csrf_token %}
             <div class="form-floating mb-3">
-              <input type="text" class="form-control rounded-3" id="floatingInput" value="{{ user_name }}" name = "name">
+              <input type="text" class="form-control rounded-3" id="floatingInput" value="{{ user_name }}" name = "username">
               <label for="floatingInput">姓名(暱稱)</label>
             </div>
             <div class="form-floating mb-3">
@@ -83,7 +83,7 @@
               <label for="floatingInput">手機號碼</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="password" class="form-control rounded-3" id="floatingPassword" placeholder="Password" = "password">
+              <input type="password" class="form-control rounded-3" id="floatingPassword" placeholder="Password" name = "password">
               <label for="floatingPassword">重設密碼</label>
             </div>
             <div class="form-floating mb-3">
