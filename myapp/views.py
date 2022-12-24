@@ -26,6 +26,7 @@ def index_view(request):
     if request.user.is_authenticated:
         # account = "888"
         account = request.user
+        print(account)
         user = client.objects.get(PHONE_NUMBER = account)
         user_name=user.NAME
         user_point=user.POINT
@@ -44,9 +45,9 @@ def fix_view(request):
     if request.user.is_authenticated:
         user_phone = request.user
         user = client.objects.get(PHONE_NUMBER = user_phone)
-        user_name=user.NAME
-        user_point=user.POINT
-        user_barcode=user.PHONE_NUMBER
+        user_name = user.NAME
+        user_point = user.POINT
+        user_barcode = user.PHONE_NUMBER
         return render(request, 'fix.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -59,10 +60,16 @@ def fix(request):
     user_name = request.POST.get('username')
     user_phone = request.POST.get("phone_number")
     user_password = request.POST.get('password')
-    client.objects.filter(PHONE_NUMBER = request.user).update(NAME = user_name, PHONE_NUMBER = user_phone, PASSWORD = user_password)
-    User.objects.filter(username = request.user).update(username = user_phone, password = user_password)
-    user = auth.authenticate(username = user_phone, password = user_password)
-    auth.login(request, user)
+    client.objects.filter(PHONE_NUMBER = request.user).update(NAME = user_name, PASSWORD = user_password)
+    
+    # 驗證的資料庫（僅做密碼更新）
+    user = User.objects.get(username = request.user)
+    user.set_password(user_password)
+    user.save()
+    
+    # auth.logout(request)
+    # user = auth.authenticate(username = user_phone, password = user_password)
+    # auth.login(request, user)
     messages.error(request, '會員資料已更新')
     return HttpResponseRedirect("/member/")
 
@@ -137,11 +144,8 @@ def login(request):
         messages.error(request, '帳號或密碼錯誤')  
         return render(request, 'login.html', locals())
     username = request.POST.get('uphone', '')
-    print(username)
     password = request.POST.get('upwd', '')
-    print(password)
     user = auth.authenticate(username = username, password = password)
-    print(user)
     if user is not None and user.is_active:
         print(user)
         print('user.is_active')
