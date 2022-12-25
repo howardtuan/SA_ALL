@@ -26,7 +26,6 @@ def index_view(request):
     if request.user.is_authenticated:
         # account = "888"
         account = request.user
-        print(account)
         user = client.objects.get(PHONE_NUMBER = account)
         user_name=user.NAME
         user_point=user.POINT
