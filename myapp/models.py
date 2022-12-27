@@ -7,6 +7,7 @@ class client(models.Model):
     PHONE_NUMBER = models.CharField(max_length=20)
     PASSWORD = models.CharField(max_length=20)
     POINT = models.IntegerField()
+    PHOTO = models.FileField()
 
 class APP_LINK(models.Model):
     USER_PHONE = models.CharField(max_length=20)
