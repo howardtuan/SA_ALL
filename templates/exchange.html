@@ -31,6 +31,7 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="../myself/">我的點數</a></li>
               <li><a class="dropdown-item" href="../exchange/">點數商城</a></li>
+              <li><a class="dropdown-item" href="../tickets/">戰利品</a></li>
             </ul>
           </li>
           <li class="nav-item dropdown">
@@ -66,27 +67,20 @@
   
       <div class="container" style="margin: auto;">
         <div class="row align-items-center ex_block_top">
-            <div class="rol text-center fs-5">碳權點數：10000</div>
+            <div class="rol text-center fs-5">碳權點數：{{ user_point }}</div>
         </div>
         <h3 class="text-left rk_title">兌換：</h3>
+
+        {% for item in items %}
         <div class="row align-items-center ex_block">
-          <div class="col-8 text-left fs-5">火鍋餐廳入場卷：10000</div>
+          <div class="col-8 text-left fs-5">{{ item.NAME }}：{{ item.COST }}</div>
           <div class="col text-center fs-5">
             <button type="button" class="btn btn-light">兌換</button>
           </div>
         </div>
-        <div class="row align-items-center ex_block">
-          <div class="col-8 text-left fs-5">錢櫃入場卷：15000</div>
-          <div class="col text-center fs-5">
-            <button type="button" class="btn btn-light">兌換</button>
-          </div>
-        </div>
-        <div class="row align-items-center ex_block">
-          <div class="col-8 text-left fs-5">炭烤餐廳入場卷：10000</div>
-          <div class="col text-center fs-5">
-            <button type="button" class="btn btn-light">兌換</button>
-          </div>
-        </div>
+        {% endfor %}
+        
+        
       </div>
     
 

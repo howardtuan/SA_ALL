@@ -30,4 +30,4 @@ class HISTORY(models.Model):
 class EXCHANGE_ITEM(models.Model):
     ID =  models.AutoField
     NAME = models.CharField(max_length=20)
-    COST = models.IntegerField
+    COST = models.IntegerField()

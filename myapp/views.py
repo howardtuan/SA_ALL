@@ -3,7 +3,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from datetime import datetime
 
 from django.urls import reverse
-from myapp.models import client
+from myapp.models import *
 from django.http import Http404
 from django.contrib import auth,messages
 from django.contrib.auth.models import User
@@ -42,7 +42,19 @@ def apps_view(request):
     return render(request, 'orthers_app.html', locals())
 
 def exchange_view(request):
-    return render(request, 'exchange.html', locals())
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_point=user.POINT
+        items = EXCHANGE_ITEM.objects.all()
+        
+
+        return render(request, 'exchange.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
+    
+    
 
 # 修改會員資料
 def fix_view(request):
@@ -125,7 +137,7 @@ def percentcheck(phone):
     point=sorted_dict[memberindex][1]
    
     
-    urank=sorted_dict.index(sorted_dict[memberindex])+1
+    urank=len(sorted_dict)-sorted_dict.index(sorted_dict[memberindex])
   
     # PR計算：(100/N*贏過的人數)+(100/N/2)
     pr=int(round((100/len(sorted_dict)*(len(sorted_dict)-urank))+(100/len(sorted_dict)/2),0))
@@ -186,6 +198,8 @@ def myself_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+def tickets_view(request):
+    return render(request, 'tickets.html', locals())
 
 def question_view(request):
     return render(request, 'question.html', locals())
