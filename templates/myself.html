@@ -66,18 +66,19 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content rounded-4 shadow card_block" id="modal-content">
           <div class="modal-body p-5 ">
-            <h2 class="fw-bold mb-0 text-center">目前排位：白金</h2>
+            <h2 class="fw-bold mb-0 text-center">目前排位：{{ UserRank_Now }}</h2>
             
             <div class="text-center">
-              <img width="200px" src="{% static 'img/ranktest2.png'%}" class="pic">
+              <img width="200px" src="/static/img/{{ UserRankURL_Now }}" class="pic">
             </div>
             <div class="progress" style="height: 30px">
-              <div class="progress-bar bg-success" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+           
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ UserPR }}%;" aria-valuenow="{{ UserPR }}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             
             <p></p>
-            <h3 class="text-center text-success">60%</h3>
-            <h3 class="text-center">碳權點數：10000</h3>
+            <h3 class="text-center text-success">{{ UserPR }}%</h3>
+            <h3 class="text-center">碳權點數：{{ UserPoint }}</h3>
             <div style="height: 2px;" class="bg-success"></div>
             <p></p>
             <div class="col">
@@ -86,10 +87,12 @@
             <div class="container">
               <div class="row">
                 <div class="col">
-                  <h2 class="text-center nextlevel_center">鑽石</h2>
+                  <h2 class="text-center nextlevel_center">{{ UserRank_Next }}</h2>
                 </div>
                 <div class="col">
-                  <img width="120px" src="{% static 'img/ranktest.png'%}" class="pic">
+                  
+                  <img width="120px" src="/static/img/{{ UserRankURL_Next }}" class="pic">
+                  
                 </div>
               </div>
             </div>
