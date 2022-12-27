@@ -9,6 +9,9 @@ from django.contrib import auth,messages
 from django.contrib.auth.models import User
 # from django.shortcuts import get_object_or_404, get_list_or_404 # 快捷函数
 
+from barcode import EAN13
+from barcode.writer import ImageWriter 
+
 # Create your views here.
 
 
@@ -20,6 +23,7 @@ def main(request):
         user_name=user.NAME
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
+        user_photo = user.PHOTO
     return render(request, 'index.html', locals())
 
 def index_view(request):
@@ -30,6 +34,7 @@ def index_view(request):
         user_name=user.NAME
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
+        user_photo = user.PHOTO
     return render(request, 'index.html', locals())
 
 
@@ -112,20 +117,24 @@ def signup(request):
     if(request.POST.get('upwd')!=request.POST.get('upwd2')):
         messages.error(request, '密碼輸入不一致，請重新輸入')  
         return render(request, 'signup.html',locals())
-    newphone=request.POST.get('uphone')
+    phone_number = request.POST.get('uphone')
     # check_account = client.objects.filter(PHONE_NUMBER=newphone).first()
     # print(check_account)
     # print(type(check_account))
     # if(check_account!="None"):
     #     messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
     #     return render(request, 'signup.html',locals())
-    count = client.objects.filter(PHONE_NUMBER=newphone).count()
+    count = client.objects.filter(PHONE_NUMBER = phone_number).count()
     if count!=0:
         messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
         return render(request, 'signup.html',locals())
     messages.error(request, '註冊成功！')
-    User.objects.create_user(username = request.POST.get('uphone'), password = request.POST.get('upwd')) # 驗證的資料庫
-    client.objects.create(NAME = request.POST.get('uname'),PHONE_NUMBER=request.POST.get('uphone'),PASSWORD=request.POST.get('upwd'),POINT=0)
+    
+    # 轉換barcode
+    my_code = EAN13(phone_number.zfill(13), writer=ImageWriter())
+    
+    client.objects.create(NAME = request.POST.get('uname'), PHONE_NUMBER = phone_number, PASSWORD=request.POST.get('upwd'), POINT=0, PHOTO = my_code.save("static/barcode/" + phone_number))
+    User.objects.create_user(username = phone_number, password = request.POST.get('upwd')) # 驗證的資料庫
     return HttpResponseRedirect('/login/')
 
 #登入
