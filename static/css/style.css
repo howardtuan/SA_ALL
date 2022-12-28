@@ -31,6 +31,13 @@
     background-color:rgba(131,196,140,0.5299999713897705);
     margin-bottom: 3%;
 }
+.ex_block_car{
+    height: 90px;
+    border:2px rgba(218, 84, 40, 0.53) solid;
+    border-radius:10px;
+    background-color:rgba(255, 72, 0, 0.53);
+    margin-bottom: 3%;
+}
 .ex_block_top{
     height: 60px;
     border:2px rgb(211, 161, 0) solid;
