@@ -16,18 +16,18 @@ class APP_LINK(models.Model):
 
 class EXCHANGE(models.Model):
     USER_PHONE = models.CharField(max_length=10)
-    DATE = models.DateField
+    DATE = models.DateField()
     COST = models.IntegerField()
     ITEM_ID = models.IntegerField()
 
 class HISTORY(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     APP_ID = models.CharField(max_length=10)
-    DATE = models.DateField
+    DATE = models.DateField()
     POINT = models.IntegerField()
     DETAIL = models.CharField(max_length = 50)
 
 class EXCHANGE_ITEM(models.Model):
-    ID =  models.AutoField
+    ID =  models.AutoField(primary_key = True)
     NAME = models.CharField(max_length=20)
     COST = models.IntegerField()

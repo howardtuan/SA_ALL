@@ -45,16 +45,30 @@ def exchange_view(request):
     if request.user.is_authenticated:
         user_phone = request.user
         user = client.objects.get(PHONE_NUMBER = user_phone)
-        user_point=user.POINT
+        user_point = user.POINT
         items = EXCHANGE_ITEM.objects.all()
-        
+        for item in items:
+            print(item.ID)
 
         return render(request, 'exchange.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
-    
-    
+
+def exchange(request):
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_point = user.POINT
+        item_id = request.POST.get("item_id")
+        item_cost = int(request.POST.get("item_cost"))
+        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost))
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now())
+        messages.error(request, '兌換成功')
+        return HttpResponseRedirect("/exchange/")
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
 
 # 修改會員資料
 def fix_view(request):
@@ -135,14 +149,15 @@ def percentcheck(phone):
             memberindex=i
     print(sorted_dict)
     point=sorted_dict[memberindex][1]
-   
+
     
     urank=len(sorted_dict)-sorted_dict.index(sorted_dict[memberindex])
-  
+
     # PR計算：(100/N*贏過的人數)+(100/N/2)
     pr=int(round((100/len(sorted_dict)*(len(sorted_dict)-urank))+(100/len(sorted_dict)/2),0))
     
     return point,pr
+
 def rankcheck(point_chenck,pr_check):
     rank=["銅牌","銀牌","金牌","白金","鑽石","菁英"]
     if point_chenck > 50000 or (point_chenck>30000 and pr_check>80):
@@ -198,6 +213,7 @@ def myself_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+
 def tickets_view(request):
     return render(request, 'tickets.html', locals())
 

@@ -72,12 +72,17 @@
         <h3 class="text-left rk_title">兌換：</h3>
 
         {% for item in items %}
-        <div class="row align-items-center ex_block">
-          <div class="col-8 text-left fs-5">{{ item.NAME }}：{{ item.COST }}</div>
-          <div class="col text-center fs-5">
-            <button type="button" class="btn btn-light">兌換</button>
+        <form action = "/exchange_proccess/" method = "POST">
+          {% csrf_token %}
+          <div class="row align-items-center ex_block">
+            <div class="col-8 text-left fs-5">{{ item.NAME }}：{{ item.COST }}</div>
+            <div class="col text-center fs-5">
+              <input type = "hidden" name = "item_id" value = {{ item.ID }}></input>
+              <input type = "hidden" name = "item_cost" value = {{ item.COST }}></input>
+              <input type="submit" class="btn btn-light" value = "兌換"></input>
+            </div>
           </div>
-        </div>
+        </form>
         {% endfor %}
         
         

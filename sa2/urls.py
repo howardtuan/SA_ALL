@@ -23,6 +23,7 @@ urlpatterns = [
     path('index/', views.index_view),
     path('orthers_app/', views.apps_view),
     path('exchange/', views.exchange_view),
+    path('exchange_proccess/', views.exchange),
     path('fix/', views.fix_view),
     path('fix_proccess/', views.fix),
     path('history/', views.history_view),
