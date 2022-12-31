@@ -47,8 +47,8 @@ def exchange_view(request):
         user = client.objects.get(PHONE_NUMBER = user_phone)
         user_point = user.POINT
         items = EXCHANGE_ITEM.objects.all()
-        for item in items:
-            print(item.ID)
+        # for item in items:
+        #     print(item.ID)
 
         return render(request, 'exchange.html', locals())
     else:
@@ -61,9 +61,10 @@ def exchange(request):
         user = client.objects.get(PHONE_NUMBER = user_phone)
         user_point = user.POINT
         item_id = request.POST.get("item_id")
+        item_name = request.POST.get("item_name")
         item_cost = int(request.POST.get("item_cost"))
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost))
-        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now())
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name)
         messages.error(request, '兌換成功')
         return HttpResponseRedirect("/exchange/")
     else:
@@ -215,7 +216,13 @@ def myself_view(request):
         return HttpResponseRedirect("/login/")
 
 def tickets_view(request):
-    return render(request, 'tickets.html', locals())
+    if request.user.is_authenticated:
+        tickets = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
+        total_tickets = tickets.count()
+        return render(request, 'tickets.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
 
 def question_view(request):
     return render(request, 'question.html', locals())

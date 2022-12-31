@@ -78,6 +78,7 @@
             <div class="col-8 text-left fs-5">{{ item.NAME }}：{{ item.COST }}</div>
             <div class="col text-center fs-5">
               <input type = "hidden" name = "item_id" value = {{ item.ID }}></input>
+              <input type = "hidden" name = "item_name" value = {{ item.NAME }}></input>
               <input type = "hidden" name = "item_cost" value = {{ item.COST }}></input>
               <input type="submit" class="btn btn-light" value = "兌換"></input>
             </div>

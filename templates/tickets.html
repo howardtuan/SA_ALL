@@ -67,7 +67,7 @@
   
   <div class="container" style="margin: auto;">
     <div class="row align-items-center ex_block_top">
-        <div class="rol text-center fs-5">戰利品數量：5</div>
+        <div class="rol text-center fs-5">戰利品數量：{{ total_tickets }}</div>
     </div>
     <div class="row align-items-center ex_block_car">
       <div class="col-8 text-left fs-5">瑪莎拉蒂使用權(5000/hr)-使用中</div>
@@ -81,12 +81,14 @@
         <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#car_unUse">開始使用</button>
       </div>
     </div>
+    {% for ticket in tickets %}
     <div class="row align-items-center ex_block">
-      <div class="col-8 text-left fs-5">火鍋餐廳入場卷x1</div>
+      <div class="col-8 text-left fs-5">{{ ticket.ITEM_NAME }}</div>
       <div class="col text-center fs-5">
         <button type="button" class="btn btn-light"  >詳細內容</button>
       </div>
     </div>
+    {% endfor %}
     <!-- Modal 瑪莎（未使用）-->
     <div class="modal fade" id="car_unUse" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -131,7 +133,7 @@
           </div>
         </div>
       </div>
-    <div class="row align-items-center ex_block">
+    {% comment %} <div class="row align-items-center ex_block">
       <div class="col-8 text-left fs-5">KTV入場卷x2</div>
       <div class="col text-center fs-5">
         <button type="button" class="btn btn-light">詳細內容</button>
@@ -141,7 +143,7 @@
       <div class="col-8 text-left fs-5">炭烤餐廳入場卷x2</div>
       <div class="col text-center fs-5">
         <button type="button" class="btn btn-light">詳細內容</button>
-      </div>
+      </div> {% endcomment %}
     </div>
   </div>
     
