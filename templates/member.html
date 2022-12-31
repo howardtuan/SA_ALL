@@ -75,9 +75,10 @@
             <p class="text-center">碳權點數：{{ user_point }}</p>
             <div class="text-center">
               
-              <img width="200px" height="85px" src="{% static 'img/NYKD54.png'%}" >
+              {% comment %} <img width="200px" height="85px" src="{% static 'img/NYKD54.png'%}" > {% endcomment %}
+              <img width="200px" height="85px" src="../{{ user_photo }}" >
             </div>
-            <p class="text-center">碳權載具：{{ user_barcode }}</p>
+            {% comment %} <p class="text-center">碳權載具：{{ user_barcode }}</p> {% endcomment %}
             <p class="text-center">-----------基本資料-----------</p>
             <p class="text-left">姓名(暱稱)：{{ user_name }}</p>
             <p class="text-left">電話：{{ user_phone }}</p>

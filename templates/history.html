@@ -68,25 +68,29 @@
   </div>
   
   <div class="list-group w-auto" style="margin-top: 3%;">
+    {% for history in history_list %}
     <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
       <div class="d-flex gap-2 w-100 justify-content-between">
         <div>
-          <h6 class="mb-0">智慧喜</h6>
-          <p class="mb-0 opacity-75">點數變動：+20</p>
+          <h6 class="mb-0">{{ history.APP_ID }}</h6>
+          <p class="mb-0 opacity-75">點數變動：+{{ hsitory.POINT }}</p>
         </div>
-        <small class="opacity-50 text-nowrap">2022/10/7</small>
+        <small class="opacity-50 text-nowrap">{{ history.DATE }}</small>
       </div>
     </a>
+    {% endfor %}
+    {% for exchange in exchange_list %}
     <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
       <div class="d-flex gap-2 w-100 justify-content-between">
         <div>
-          <h6 class="mb-0">火鍋餐廳入場卷</h6>
-          <p class="mb-0 opacity-75">點數變動：-10000</p>
+          <h6 class="mb-0">{{ exchange.ITEM_NAME}}</h6>
+          <p class="mb-0 opacity-75">點數變動：-{{ exchange.COST }}</p>
         </div>
-        <small class="opacity-50 text-nowrap">2022/8/3</small>
+        <small class="opacity-50 text-nowrap">{{ exchange.DATE }}</small>
       </div>
     </a>
-    <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+    {% endfor %}
+    {% comment %} <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
       <div class="d-flex gap-2 w-100 justify-content-between">
         <div>
           <h6 class="mb-0">智慧喜</h6>
@@ -94,7 +98,7 @@
         </div>
         <small class="opacity-50 text-nowrap">2022/5/10</small>
       </div>
-    </a>
+    </a> {% endcomment %}
   </div>
   <a href="../member/" style="text-decoration:none;">
     <div class="d-grid gap-2 col-6 mx-auto" style="margin-top:3% ;">

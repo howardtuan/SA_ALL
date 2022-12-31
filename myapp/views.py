@@ -106,6 +106,9 @@ def fix(request):
 
 def history_view(request):
     if request.user.is_authenticated:
+        exchange_list = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
+        history_list = HISTORY.objects.filter(USER_PHONE = request.user).all()
+        
         return render(request, 'history.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -121,6 +124,7 @@ def member_view(request):
         user_name=user.NAME
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
+        user_photo = user.PHOTO
         return render(request, 'member.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -218,6 +222,7 @@ def myself_view(request):
 def tickets_view(request):
     if request.user.is_authenticated:
         tickets = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
+        print(type(tickets))
         total_tickets = tickets.count()
         return render(request, 'tickets.html', locals())
     else:
