@@ -107,13 +107,20 @@ def fix(request):
 def history_view(request):
     if request.user.is_authenticated:
         exchange_list = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
-        history_list = HISTORY.objects.filter(USER_PHONE = request.user).all()
+        
         
         return render(request, 'history.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
-
+def history_otherAPP_view(request):
+    if request.user.is_authenticated:
+        history_list = HISTORY.objects.filter(USER_PHONE = request.user).all()
+        
+        return render(request, 'history_otherAPP.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
 def login_view(request):
     return render(request, 'login.html', locals())
 

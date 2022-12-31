@@ -65,18 +65,18 @@
     </div>
   </nav>
   <div style="margin-top: 3%;">
-    <h2 class="fw-bold mb-0 text-center">碳治郎點數兌換紀錄</h2>
+    <h2 class="fw-bold mb-0 text-center">其他APP消費紀錄</h2>
   </div>
   
   <div class="list-group w-auto" style="margin-top: 3%;">
-    {% for exchange in exchange_list %}
+    {% for history in history_list %}
     <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
       <div class="d-flex gap-2 w-100 justify-content-between">
         <div>
-          <h6 class="mb-0">{{ exchange.ITEM_NAME}}</h6>
-          <p class="mb-0 opacity-75">點數變動：-{{ exchange.COST }}</p>
+          <h6 class="mb-0">{{ history.APP_ID }}</h6>
+          <p class="mb-0 opacity-75">點數變動：+{{ hsitory.POINT }}</p>
         </div>
-        <small class="opacity-50 text-nowrap">{{ exchange.DATE }}</small>
+        <small class="opacity-50 text-nowrap">{{ history.DATE }}</small>
       </div>
     </a>
     {% endfor %}

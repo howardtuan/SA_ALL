@@ -27,6 +27,7 @@ urlpatterns = [
     path('fix/', views.fix_view),
     path('fix_proccess/', views.fix),
     path('history/', views.history_view),
+    path('history_otherAPP/', views.history_otherAPP_view),
     path('login/', views.login_view),
     path('member/', views.member_view),
     path('myself/', views.myself_view),
