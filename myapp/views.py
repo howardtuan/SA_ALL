@@ -63,6 +63,10 @@ def exchange(request):
         item_id = request.POST.get("item_id")
         item_name = request.POST.get("item_name")
         item_cost = int(request.POST.get("item_cost"))
+        if user_point < item_cost:
+            messages.error(request, '您的點數需大於兌換點數！')
+            return HttpResponseRedirect("/exchange/")
+        
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost))
         EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name)
         messages.error(request, '兌換成功')
@@ -113,6 +117,7 @@ def history_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+
 def history_otherAPP_view(request):
     if request.user.is_authenticated:
         history_list = HISTORY.objects.filter(USER_PHONE = request.user).all()
@@ -121,6 +126,7 @@ def history_otherAPP_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+
 def login_view(request):
     return render(request, 'login.html', locals())
 
