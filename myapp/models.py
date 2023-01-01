@@ -20,6 +20,7 @@ class EXCHANGE(models.Model):
     COST = models.IntegerField()
     ITEM_ID = models.IntegerField()
     ITEM_NAME = models.CharField(max_length=20)
+    USED = models.BooleanField()
 
 class HISTORY(models.Model):
     USER_PHONE = models.CharField(max_length=20)

@@ -110,7 +110,7 @@ def fix(request):
 
 def history_view(request):
     if request.user.is_authenticated:
-        exchange_list = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
+        exchange_list = EXCHANGE.objects.filter(USER_PHONE = request.user).order_by('-DATE').all()
         
         
         return render(request, 'history.html', locals())
