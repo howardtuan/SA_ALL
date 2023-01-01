@@ -33,6 +33,7 @@ urlpatterns = [
     path('myself/', views.myself_view),
     path("tickets/", views.tickets_view),
     path('use_ticket/', views.use_ticket),
+    path('drive/', views.drive),
     path('question/', views.question_view),
     path('signup/', views.signup_view),
     path('sign/', views.signup),

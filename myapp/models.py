@@ -17,7 +17,7 @@ class APP_LINK(models.Model):
 class EXCHANGE(models.Model):
     ID = models.AutoField(primary_key = True)
     USER_PHONE = models.CharField(max_length=10)
-    DATE = models.DateField()
+    DATE = models.DateTimeField()
     COST = models.IntegerField()
     ITEM_ID = models.IntegerField()
     ITEM_NAME = models.CharField(max_length=20)
@@ -26,7 +26,7 @@ class EXCHANGE(models.Model):
 class HISTORY(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     APP_ID = models.CharField(max_length=10)
-    DATE = models.DateField()
+    DATE = models.DateTimeField()
     POINT = models.IntegerField()
     DETAIL = models.CharField(max_length = 50)
 
@@ -34,3 +34,8 @@ class EXCHANGE_ITEM(models.Model):
     ID =  models.AutoField(primary_key = True)
     NAME = models.CharField(max_length=20)
     COST = models.IntegerField()
+class DRIVE(models.Model):
+    USER_PHONE = models.CharField(max_length=20)
+    NAME = models.CharField(max_length=20)
+    TIME = models.TimeField()
+    USING = models.BooleanField()

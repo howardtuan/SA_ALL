@@ -262,6 +262,16 @@ def use_ticket(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+def drive(request):
+    if request.user.is_authenticated:
+        #查詢此帳號是否insert過DRIVE 有的話就UPDATE `TIME`跟`USING` 沒有則CREATE
+        #按下「開始使用」時，`TIME`設為now()，`USING`設為TRUE，並寫條件式：if `USING`==TRUE:要一直計算時間
+        #按下「結束使用」前，要一直用now()去減掉`TIME`，並印出「分鐘」ex:目前使用：{{ spent_time }}分鐘
+        #按下「結束使用」後，`USING`設為FALSE，計算使用時間所換算而得的花費，並將相關資料存入至歷史紀錄
+        return HttpResponseRedirect("/tickets/")
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
 
 def question_view(request):
     return render(request, 'question.html', locals())

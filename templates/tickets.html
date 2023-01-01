@@ -103,6 +103,8 @@
       </div>
     </form>
     {% endfor %}
+    <!--{% if 使用者的USING==FALSE or  %}-->
+
     <!-- Modal 瑪莎（未使用）-->
     <div class="modal fade" id="car_unUse" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -119,12 +121,15 @@
           </div>
           
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">開始使用</button>
-          </div>
+          <form action="/drive/">
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">開始使用</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
+    <!--{% else %}-->
     <!-- Modal 瑪莎（使用中）-->
     <div class="modal fade" id="car_using" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -141,12 +146,15 @@
             </div>
             
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">了解</button>
-            </div>
+            <form action="/drive/">
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">--結束使用</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
+      <!--{% endif %}-->
       {% if messages %}
       <script>
       {% for msg in messages %}
