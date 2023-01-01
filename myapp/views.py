@@ -7,6 +7,7 @@ from myapp.models import *
 from django.http import Http404
 from django.contrib import auth,messages
 from django.contrib.auth.models import User
+from django.db.models import Count
 # from django.shortcuts import get_object_or_404, get_list_or_404 # 快捷函数
 
 from barcode import EAN13
@@ -68,7 +69,7 @@ def exchange(request):
             return HttpResponseRedirect("/exchange/")
         
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost))
-        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name)
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False)
         messages.error(request, '兌換成功')
         return HttpResponseRedirect("/exchange/")
     else:
@@ -234,10 +235,30 @@ def myself_view(request):
 
 def tickets_view(request):
     if request.user.is_authenticated:
-        tickets = EXCHANGE.objects.filter(USER_PHONE = request.user).all()
-        print(type(tickets))
+        tickets = EXCHANGE.objects.filter(USER_PHONE = request.user,  USED = False).all()
         total_tickets = tickets.count()
+        tickets_group = tickets.values("ITEM_ID").annotate(Count("ITEM_ID"))
+        items = []
+        for item in tickets_group:
+            ITEM_NAME = EXCHANGE_ITEM.objects.filter(ID = item["ITEM_ID"]).all()
+            tmp = [item["ITEM_ID"], ITEM_NAME[0].NAME, item["ITEM_ID__count"]]
+            items.append(tmp)
         return render(request, 'tickets.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login/")
+
+def use_ticket(request):
+    if request.user.is_authenticated:
+        item_id = request.POST.get("item_id")
+        exchanges =  EXCHANGE.objects.filter(USER_PHONE = request.user, ITEM_ID = item_id)
+        for exchange in exchanges:
+            if exchange.USED == False:
+                id = exchange.ID
+                break
+        tickets = EXCHANGE.objects.filter(ID = id).update(USED = True)
+        messages.error(request, '您已使用' + EXCHANGE_ITEM.objects.filter(ID = item_id)[0].NAME + '的使用卷')
+        return HttpResponseRedirect("/tickets/")
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")

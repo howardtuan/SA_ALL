@@ -82,13 +82,26 @@
         <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#car_unUse">開始使用</button>
       </div>
     </div>
-    {% for ticket in tickets %}
+    {% comment %} {% for ticket in tickets %}
     <div class="row align-items-center ex_block">
       <div class="col-8 text-left fs-5">{{ ticket.ITEM_NAME }}</div>
       <div class="col text-center fs-5">
         <button type="button" class="btn btn-light"  >詳細內容</button>
       </div>
     </div>
+    {% endfor %} {% endcomment %}
+    {% for item in items%}
+    <form action = "/use_ticket/" method = "post">
+      {% csrf_token %}
+      <div class="row align-items-center ex_block">
+        <div class="col-8 text-left fs-5">{{ item.1 }} X {{ item.2 }}</div>
+        <input type="hidden" name="item_id" value="{{ item.0}}"></input>
+        <div class="col text-center fs-5">
+          <button type="button" class="btn btn-light">詳細內容</button>
+          <button type="submit" class="btn btn-light" data-bs-dismiss="modal">開始使用</button>
+        </div>
+      </div>
+    </form>
     {% endfor %}
     <!-- Modal 瑪莎（未使用）-->
     <div class="modal fade" id="car_unUse" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -134,17 +147,13 @@
           </div>
         </div>
       </div>
-    {% comment %} <div class="row align-items-center ex_block">
-      <div class="col-8 text-left fs-5">KTV入場卷x2</div>
-      <div class="col text-center fs-5">
-        <button type="button" class="btn btn-light">詳細內容</button>
-      </div>
-    </div>
-    <div class="row align-items-center ex_block">
-      <div class="col-8 text-left fs-5">炭烤餐廳入場卷x2</div>
-      <div class="col text-center fs-5">
-        <button type="button" class="btn btn-light">詳細內容</button>
-      </div> {% endcomment %}
+      {% if messages %}
+      <script>
+      {% for msg in messages %}
+          alert('{{ msg.message }}');
+      {% endfor %}
+      </script>
+      {% endif %}
     </div>
   </div>
     

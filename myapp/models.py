@@ -15,6 +15,7 @@ class APP_LINK(models.Model):
     APP_USER_ID = models.CharField(max_length=10)
 
 class EXCHANGE(models.Model):
+    ID = models.AutoField(primary_key = True)
     USER_PHONE = models.CharField(max_length=10)
     DATE = models.DateField()
     COST = models.IntegerField()
