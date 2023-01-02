@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,HttpResponseRedirect
-from datetime import datetime
-
+from datetime import datetime,timezone,timedelta
+import time
 from django.urls import reverse
 from myapp.models import *
 from django.http import Http404
@@ -9,10 +9,11 @@ from django.contrib import auth,messages
 from django.contrib.auth.models import User
 from django.db.models import Count
 # from django.shortcuts import get_object_or_404, get_list_or_404 # 快捷函数
-
+from sa2 import settings
 from barcode import EAN13
 from barcode.writer import ImageWriter 
-
+# from django.utils.timezone import activate
+# activate(settings.TIME_ZONE)
 # Create your views here.
 
 
@@ -243,6 +244,50 @@ def tickets_view(request):
             ITEM_NAME = EXCHANGE_ITEM.objects.filter(ID = item["ITEM_ID"]).all()
             tmp = [item["ITEM_ID"], ITEM_NAME[0].NAME, item["ITEM_ID__count"]]
             items.append(tmp)
+
+        
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_point=user.POINT
+        #查詢此帳號是否insert過DRIVE 有的話就UPDATE `TIME`跟`USING` 沒有則CREATE
+        #按下「開始使用」時，`TIME`設為now()，`USING`設為TRUE，並寫條件式：if `USING`==TRUE:要一直計算時間
+        #按下「結束使用」前，要一直用now()去減掉`TIME`，並印出「分鐘」ex:目前使用：{{ spent_time }}分鐘
+        #按下「結束使用」後，`USING`設為FALSE，計算使用時間所換算而得的花費，並將相關資料存入至歷史紀錄(另一個func)
+        count = DRIVE.objects.filter(USER_PHONE = user_phone).count()
+        
+        if count==0:
+            pass
+        elif DRIVE.objects.get(USER_PHONE = user_phone).USING==True:
+            use=DRIVE.objects.get(USER_PHONE = user_phone).USING
+            t=DRIVE.objects.get(USER_PHONE = user_phone).TIME
+            t2=DRIVE.objects.get(USER_PHONE = user_phone).TIME+timedelta(hours=8)     
+            
+            spent=driveTime(request.user,str(t2)[0:19])
+            if spent <= 30:
+                cost=2000
+            else:
+                i=1
+                while spent>30*i:
+                    i+=1
+                cost=2000*i
+            if user_point<cost:
+                #強制結束
+                DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False)
+                # DRIVE.objects.get(USER_PHONE = user_phone).USING=False
+                overtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                starttime=str(DRIVE.objects.get(USER_PHONE = user_phone).TIME+timedelta(hours=8))[0:19]
+                start_timestruct = datetime.strptime(starttime, "%Y-%m-%d %H:%M:%S")
+                overtime_timestruct = datetime.strptime(overtime, "%Y-%m-%d %H:%M:%S")
+                total_seconds = (overtime_timestruct - start_timestruct).total_seconds()
+                total_time = int(total_seconds / 60)
+                print("spent time",total_time)
+                #存入資料庫
+                #存入資料庫
+                client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - cost))
+                EXCHANGE.objects.create(USER_PHONE = user_phone, COST = cost, ITEM_ID = 87, DATE = datetime.now(), ITEM_NAME = '駕駛瑪莎拉蒂', USED = True)
+
+        elif DRIVE.objects.get(USER_PHONE = user_phone).USING==False:
+            use=DRIVE.objects.get(USER_PHONE = user_phone).USING
         return render(request, 'tickets.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -262,12 +307,58 @@ def use_ticket(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+def driveTime(account,start):
+    
+    start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+    end=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    end_timestruct = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+    total_seconds = (end_timestruct - start_timestruct).total_seconds()
+    min_sub = int(total_seconds / 60)
+    return min_sub
 def drive(request):
+    user_phone = request.user
+    user = client.objects.get(PHONE_NUMBER = user_phone)
+    user_point=user.POINT
+    count = DRIVE.objects.filter(USER_PHONE = user_phone).count()
+    if count==0:
+                #沒用過
+        start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        DRIVE.objects.create(USER_PHONE = user_phone, NAME = 'DriveCar', TIME=start_timestruct, USING=True)
+        return HttpResponseRedirect("/tickets/")
+    elif DRIVE.objects.get(USER_PHONE = user_phone).USING==False:
+                #用過
+        start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+        DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True)
+        return HttpResponseRedirect("/tickets/")
+    return HttpResponseRedirect("/tickets/")
+  
+
+def drive_over(request):
     if request.user.is_authenticated:
-        #查詢此帳號是否insert過DRIVE 有的話就UPDATE `TIME`跟`USING` 沒有則CREATE
-        #按下「開始使用」時，`TIME`設為now()，`USING`設為TRUE，並寫條件式：if `USING`==TRUE:要一直計算時間
-        #按下「結束使用」前，要一直用now()去減掉`TIME`，並印出「分鐘」ex:目前使用：{{ spent_time }}分鐘
-        #按下「結束使用」後，`USING`設為FALSE，計算使用時間所換算而得的花費，並將相關資料存入至歷史紀錄
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_point=user.POINT
+        DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False)
+        # DRIVE.objects.get(USER_PHONE = user_phone).USING=False
+        overtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        starttime=str(DRIVE.objects.get(USER_PHONE = user_phone).TIME+timedelta(hours=8))[0:19]
+        start_timestruct = datetime.strptime(starttime, "%Y-%m-%d %H:%M:%S")
+        overtime_timestruct = datetime.strptime(overtime, "%Y-%m-%d %H:%M:%S")
+        total_seconds = (overtime_timestruct - start_timestruct).total_seconds()
+        total_time = int(total_seconds / 60)
+        print("spent time",total_time)
+        if total_time <= 30:
+            cost=2000
+        else:
+            i=1
+            while total_time>30*i:
+                i+=1
+            cost=2000*i
+        #存入資料庫
+        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - cost))
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = cost, ITEM_ID = 87, DATE = datetime.now(), ITEM_NAME = '駕駛瑪莎拉蒂', USED = True)
         return HttpResponseRedirect("/tickets/")
     else:
         messages.error(request, '您尚未登入，請先登入')

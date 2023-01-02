@@ -34,6 +34,7 @@ urlpatterns = [
     path("tickets/", views.tickets_view),
     path('use_ticket/', views.use_ticket),
     path('drive/', views.drive),
+    path('drive_over/', views.drive_over),
     path('question/', views.question_view),
     path('signup/', views.signup_view),
     path('sign/', views.signup),

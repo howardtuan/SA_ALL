@@ -37,5 +37,5 @@ class EXCHANGE_ITEM(models.Model):
 class DRIVE(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     NAME = models.CharField(max_length=20)
-    TIME = models.TimeField()
+    TIME = models.DateTimeField()
     USING = models.BooleanField()

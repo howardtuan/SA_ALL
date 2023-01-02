@@ -11,6 +11,12 @@
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <title>碳治郎</title>
+    <script>
+      function myrefresh() {
+        window.location.reload();
+    }
+    setTimeout('myrefresh()', 60000); //指定1分鐘刷新一次
+    </script>
 </head>
 <body class="body">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -71,15 +77,18 @@
         <div class="rol text-center fs-5">戰利品數量：{{ total_tickets }}</div>
     </div>
     <div class="row align-items-center ex_block_car">
-      <div class="col-8 text-left fs-5">瑪莎拉蒂使用權(5000/hr)-使用中</div>
+      <div class="col-8 text-left fs-5">瑪莎拉蒂使用權(2000/30min)</div>
       <div class="col text-center fs-5">
-        <!--結束使用
-        <button type="button" class="btn btn-light" style="margin-bottom: 2px;" data-bs-toggle="modal" data-bs-target="#car_using">詳細內容</button>
-        
-        <button type="button" class="btn btn-light">結束使用</button>
-        -->
         <!--開始使用-->
+        {% if count == 0 %}
         <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#car_unUse">開始使用</button>
+        {% elif use == False %}
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#car_unUse">開始使用</button>
+        <!--結束使用-->
+        {% else %}
+        <button type="button" class="btn btn-light" style="margin-bottom: 2px;" data-bs-toggle="modal" data-bs-target="#car_using">結束使用</button>
+        {% endif %}
+        
       </div>
     </div>
     {% comment %} {% for ticket in tickets %}
@@ -103,7 +112,6 @@
       </div>
     </form>
     {% endfor %}
-    <!--{% if 使用者的USING==FALSE or  %}-->
 
     <!-- Modal 瑪莎（未使用）-->
     <div class="modal fade" id="car_unUse" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -122,14 +130,14 @@
           
           </div>
           <form action="/drive/">
+            {% csrf_token %}
             <div class="modal-footer">
-              <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">開始使用</button>
+              <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal" name="drive_car" value="1" >開始使用</button>
             </div>
           </form>
         </div>
       </div>
     </div>
-    <!--{% else %}-->
     <!-- Modal 瑪莎（使用中）-->
     <div class="modal fade" id="car_using" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -140,21 +148,20 @@
             </div>
             <div class="modal-body">
             <div style="border:1px solid #cccccc; width:100%;height:500px;background-color:#FFFFFF;padding:5px;overflow:auto;border:0px;">
-            <p>每小時5000點，未滿一小時以一小時計算</p>
-            <p>目前使用時間：01:34:28</p>
-            <p>預計花費點數：10000</p>
+            <p>每半小時2000點，未滿半小時以半小時計算</p>
+            <p>目前使用時間：{{ spent }}分鐘</p>
+            <p>預計花費點數：{{ cost }}點</p>
             </div>
             
             </div>
-            <form action="/drive/">
+            <form action="/drive_over/">
               <div class="modal-footer">
-                <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">--結束使用</button>
+                <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">結束使用</button>
               </div>
             </form>
           </div>
         </div>
       </div>
-      <!--{% endif %}-->
       {% if messages %}
       <script>
       {% for msg in messages %}
