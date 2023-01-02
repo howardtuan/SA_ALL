@@ -307,6 +307,7 @@ def use_ticket(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login/")
+
 def driveTime(account,start):
     
     start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
@@ -315,6 +316,7 @@ def driveTime(account,start):
     total_seconds = (end_timestruct - start_timestruct).total_seconds()
     min_sub = int(total_seconds / 60)
     return min_sub
+
 def drive(request):
     user_phone = request.user
     user = client.objects.get(PHONE_NUMBER = user_phone)
@@ -333,7 +335,6 @@ def drive(request):
         DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True)
         return HttpResponseRedirect("/tickets/")
     return HttpResponseRedirect("/tickets/")
-  
 
 def drive_over(request):
     if request.user.is_authenticated:
