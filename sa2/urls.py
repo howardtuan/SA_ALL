@@ -40,7 +40,7 @@ urlpatterns = [
     path('sign/', views.signup),
     path('login_process/', views.login),
     path("logout/", views.logout),
-     path("SA_ALL/news/", include("news.urls")),
+    path("SA_ALL/news/", include("news.urls")),
     # path(r'^admin/', admin.site.urls),
     # path(r'^$', sayhello),
 ]
