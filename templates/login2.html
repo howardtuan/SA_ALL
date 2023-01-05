@@ -64,43 +64,39 @@
       </div>
     </div>
   </nav>
-      <h1 class="text-center ex_title">點數商城</h1>
-  
-      <div class="container" style="margin: auto;">
-        <div class="row align-items-center ex_block_top">
-            <div class="rol text-center fs-5">碳權點數：{{ user_point }}</div>
+      <div class="modal-content rounded-4 shadow" id="modal-content">
+        <div class="modal-header p-5 pb-4 border-bottom-0">
+          <!-- <h1 class="modal-title fs-5" >Modal title</h1> -->
+          <h1 class="fw-bold mb-0 fs-2">登入</h1>
+          <a href="../index/">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </a>
         </div>
-        <h3 class="text-left rk_title">兌換：</h3>
-
-        {% for item in items %}
-        <form action = "/exchange_proccess/" method = "POST">
-          {% csrf_token %}
-          <div class="row align-items-center ex_block">
-            <div class="col-8 text-left fs-5">{{ item.NAME }}：{{ item.COST }}</div>
-            <div class="col text-center fs-5">
-              <input type = "hidden" name = "item_id" value = {{ item.ID }}></input>
-              <input type = "hidden" name = "item_name" value = {{ item.NAME }}></input>
-              <input type = "hidden" name = "item_cost" value = {{ item.COST }}></input>
-              <input type="submit" class="btn btn-light" value = "兌換"></input>
+  
+        <div class="modal-body p-5 pt-0">
+          <form class="" action="/login_process2/" method="post">
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control rounded-3" id="uphone" name="uphone" placeholder="手機號碼">
+              <label for="uphone">手機號碼</label>
             </div>
-          </div>
-        </form>
+            <div class="btn_center">
+              <button type="submit" class="btn btn-outline-success">登入</button>
+            </div>
+            <p></p>
+            <small class="text-muted">歡迎使用碳治郎系統，若您還沒有帳號，請點擊註冊按鈕加入會員。</small>
+          </form>
+          {% if messages %}
+        <script>
+        {% for msg in messages %}
+            alert('{{ msg.message }}');
         {% endfor %}
-        
-        
+        </script>
+        {% endif %}
+        </div>
       </div>
-    
-      {% if messages %}
-      <script>
-      {% for msg in messages %}
-          alert('{{ msg.message }}');
-      {% endfor %}
-      </script>
-      {% endif %}
-      
-      
-      
-      
-      
+      <div class="text-center">
+        <img width="300px" height="300px" src="{% static 'img/tree.png'%}" >
+      </div>
 </body>
 </html>

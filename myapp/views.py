@@ -55,7 +55,7 @@ def exchange_view(request):
         return render(request, 'exchange.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def exchange(request):
     if request.user.is_authenticated:
@@ -75,7 +75,7 @@ def exchange(request):
         return HttpResponseRedirect("/exchange/")
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 # 修改會員資料
 def fix_view(request):
@@ -88,7 +88,7 @@ def fix_view(request):
         return render(request, 'fix.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def fix(request):
     if(request.POST.get('password')!=request.POST.get('double_check')):
@@ -110,6 +110,26 @@ def fix(request):
     messages.error(request, '會員資料已更新')
     return HttpResponseRedirect("/member/")
 
+# 修改會員資料
+def fix2_view(request):
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_name = user.NAME
+        user_point = user.POINT
+        user_barcode = user.PHONE_NUMBER
+        return render(request, 'fix2.html', locals())
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login2/")
+
+def fix2(request):
+    user_name = request.POST.get('username')
+    user_phone = request.POST.get("phone_number")
+    client.objects.filter(PHONE_NUMBER = request.user).update(NAME = user_name)
+    messages.error(request, '會員資料已更新')
+    return HttpResponseRedirect("/member/")
+
 def history_view(request):
     if request.user.is_authenticated:
         exchange_list = EXCHANGE.objects.filter(USER_PHONE = request.user).order_by('-DATE').all()
@@ -118,7 +138,7 @@ def history_view(request):
         return render(request, 'history.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def history_otherAPP_view(request):
     if request.user.is_authenticated:
@@ -127,11 +147,12 @@ def history_otherAPP_view(request):
         return render(request, 'history_otherAPP.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def login_view(request):
     return render(request, 'login.html', locals())
-
+def login2_view(request):
+    return render(request, 'login2.html', locals())
 def member_view(request):
     if request.user.is_authenticated:
         user_phone = request.user
@@ -143,7 +164,7 @@ def member_view(request):
         return render(request, 'member.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def percentcheck(phone):
     #要select所有人的手機及點數分別匯入兩個陣列
@@ -232,7 +253,7 @@ def myself_view(request):
         return render(request, 'myself.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def tickets_view(request):
     if request.user.is_authenticated:
@@ -291,7 +312,7 @@ def tickets_view(request):
         return render(request, 'tickets.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def use_ticket(request):
     if request.user.is_authenticated:
@@ -306,7 +327,7 @@ def use_ticket(request):
         return HttpResponseRedirect("/tickets/")
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def driveTime(account,start):
     
@@ -363,14 +384,15 @@ def drive_over(request):
         return HttpResponseRedirect("/tickets/")
     else:
         messages.error(request, '您尚未登入，請先登入')
-        return HttpResponseRedirect("/login/")
+        return HttpResponseRedirect("/login2/")
 
 def question_view(request):
     return render(request, 'question.html', locals())
 
 def signup_view(request):
     return render(request, 'signup.html', locals())
-
+def signup2_view(request):
+    return render(request, 'signup2.html', locals())
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/index/')
@@ -381,12 +403,6 @@ def signup(request):
         messages.error(request, '密碼輸入不一致，請重新輸入')  
         return render(request, 'signup.html',locals())
     phone_number = request.POST.get('uphone')
-    # check_account = client.objects.filter(PHONE_NUMBER=newphone).first()
-    # print(check_account)
-    # print(type(check_account))
-    # if(check_account!="None"):
-    #     messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
-    #     return render(request, 'signup.html',locals())
     count = client.objects.filter(PHONE_NUMBER = phone_number).count()
     if count!=0:
         messages.error(request, '此組手機號碼已註冊過，請勿重複註冊')  
@@ -399,6 +415,54 @@ def signup(request):
     client.objects.create(NAME = request.POST.get('uname'), PHONE_NUMBER = phone_number, PASSWORD=request.POST.get('upwd'), POINT=0, PHOTO = my_code.save("static/barcode/" + phone_number))
     User.objects.create_user(username = phone_number, password = request.POST.get('upwd')) # 驗證的資料庫
     return HttpResponseRedirect('/login/')
+def signup2(request):
+    if request.user.is_authenticated:
+        user_phone = request.user
+        user = client.objects.get(PHONE_NUMBER = user_phone)
+        user_name = request.POST.get('uname')
+        client.objects.filter(PHONE_NUMBER = user_phone).update(NAME = user_name)
+        return HttpResponseRedirect('/index/')
+    else:
+        messages.error(request, '您尚未登入，請先登入')
+        return HttpResponseRedirect("/login2/")
+def login2(request):
+    if request.user.is_authenticated:
+        print("is auth")
+        return HttpResponseRedirect('/index/')
+    userphone=request.POST['uphone']
+    # requests.post('對方的api', data = {
+    #     "phone": "userphone",
+    # })
+    count = client.objects.filter(PHONE_NUMBER = userphone).count()
+    if count==0:
+        my_code = EAN13(userphone.zfill(13), writer=ImageWriter())
+        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0, PHOTO = my_code.save("static/barcode/" + userphone))
+        User.objects.create_user(username = userphone, password = '123') # 驗證的資料庫
+        password = 123#(所有人都一樣)
+        user = auth.authenticate(username = userphone, password = password)
+        if user is not None and user.is_active:
+            print(user)
+            print('user.is_active')
+            auth.login(request, user)
+            return render(request, 'signup2.html', locals())
+        else:
+            print(user)
+            print('user.n_active')
+            return render(request, 'login2.html', locals())
+            # 到新的註冊頁面註冊(密碼資料表欄位強制設為123)，輸入暱稱後直接登入
+    
+    # uid存在的話就直接登入就好
+    password = 123#大家都一樣
+    user = auth.authenticate(username = userphone, password = password)
+    if user is not None and user.is_active:
+        print(user)
+        print('user.is_active')
+        auth.login(request, user)
+        return HttpResponseRedirect('/index/')
+    else:
+        print(user)
+        print('user.n_active')
+        return render(request, 'login2.html', locals())
 
 #登入
 def login(request):
@@ -426,3 +490,14 @@ def login(request):
         print(user)
         print('user.n_active')
         return render(request, 'login.html', locals())
+def login_session(request):
+    SA_CC_ID = request.GET.get('SA_CC_ID')
+    if 'UserID' in request.session:
+        try:
+            del request.session['UserID']
+        except:
+            pass
+    request.session['UserID'] = SA_CC_ID
+    request.session.modified = True
+    request.session.set_expiry(60*20) #存在20分鐘
+    return HttpResponseRedirect('inside.html')
