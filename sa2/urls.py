@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 from myapp import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main),
@@ -47,6 +48,7 @@ urlpatterns = [
     path('login_process2/', views.login2),
     path("logout/", views.logout),
     path("SA_ALL/news/", include("news.urls")),
+    path("api2/",views.api2)
     # path(r'^admin/', admin.site.urls),
     # path(r'^$', sayhello),
 ]

@@ -12,11 +12,15 @@ from django.db.models import Count
 from sa2 import settings
 from barcode import EAN13
 from barcode.writer import ImageWriter 
+import requests
+import json
+from django.views.decorators.csrf import csrf_exempt
+import random
 # from django.utils.timezone import activate
 # activate(settings.TIME_ZONE)
 # Create your views here.
-
-
+SACCngrok="https://04d4-1-34-54-152.jp.ngrok.io"
+serverngrok="https://e9d2-111-251-54-247.ngrok.io"
 def main(request):
     if request.user.is_authenticated:
         # account = "888"
@@ -151,8 +155,40 @@ def history_otherAPP_view(request):
 
 def login_view(request):
     return render(request, 'login.html', locals())
+
+
+
 def login2_view(request):
+    sum=""
+    rand=LOGIN.objects.create()
+    # print(rand.FKcheck)
+    # print(type(rand.FKcheck))
+    url = SACCngrok+'/RESTapiApp/Line_1/?Rbackurl='+serverngrok+'/api2/?fk='+rand.FKcheck
+    req=requests.get(url,headers = {'Authorization': 'Token 3448dc4394fd90836d9c0f1bb5341c5881ba5b74','ngrok-skip-browser-warning': '7414'})
+    # print(req.json())
+    req_read = req.json()
+    print(req_read["Rstate"])
+    LOGIN.objects.filter(FKcheck = rand.FKcheck).update(Rstate=req_read["Rstate"])
+    firstLogin="https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1657781063&redirect_uri="+SACCngrok+"/LineLoginApp/callback&state="+req_read["Rstate"]+"&scope=profile%20openid%20email&promot=consent&ui_locales=zh-TW?http://example.com/?ngrok-skip-browser-warning=7414"
+
     return render(request, 'login2.html', locals())
+
+def api2(request):
+    if request.method == 'GET':
+        fknum = request.GET.get('fk')
+        nomatter=LOGIN.objects.filter(FKcheck = fknum)
+        sum=''
+        for i in nomatter:
+            sum=i.Rstate
+    url = SACCngrok+'/RESTapiApp/Line_2/?Rstate='+sum
+    req=requests.get(url,headers = {'Authorization': 'Token 3448dc4394fd90836d9c0f1bb5341c5881ba5b74','ngrok-skip-browser-warning': '7414'})
+    req_read = req.json()
+    userUID=req_read["RuserID"]
+    req_read["Raccess_code"]
+    return login2(request,userUID)
+    
+
+    
 def member_view(request):
     if request.user.is_authenticated:
         user_phone = request.user
@@ -415,6 +451,8 @@ def signup(request):
     client.objects.create(NAME = request.POST.get('uname'), PHONE_NUMBER = phone_number, PASSWORD=request.POST.get('upwd'), POINT=0, PHOTO = my_code.save("static/barcode/" + phone_number))
     User.objects.create_user(username = phone_number, password = request.POST.get('upwd')) # 驗證的資料庫
     return HttpResponseRedirect('/login/')
+
+@csrf_exempt
 def signup2(request):
     if request.user.is_authenticated:
         user_phone = request.user
@@ -425,18 +463,24 @@ def signup2(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
-def login2(request):
+
+
+
+def login2(request,uid):
     if request.user.is_authenticated:
         print("is auth")
         return HttpResponseRedirect('/index/')
-    userphone=request.POST['uphone']
+    userphone=uid
     # requests.post('對方的api', data = {
     #     "phone": "userphone",
     # })
     count = client.objects.filter(PHONE_NUMBER = userphone).count()
     if count==0:
-        my_code = EAN13(userphone.zfill(13), writer=ImageWriter())
-        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0, PHOTO = my_code.save("static/barcode/" + userphone))
+        codenum=""
+        for i in range(10):
+            codenum+=str(random.randint(0,9))
+        my_code = EAN13(codenum.zfill(13), writer=ImageWriter())#code編碼要改
+        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone))
         User.objects.create_user(username = userphone, password = '123') # 驗證的資料庫
         password = 123#(所有人都一樣)
         user = auth.authenticate(username = userphone, password = password)

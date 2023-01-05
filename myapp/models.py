@@ -1,16 +1,22 @@
 from django.db import models
 from django.utils import timezone
-
+import uuid
+def UUIDrand():
+    return str(uuid.uuid4())
 # Create your models here.
 class client(models.Model):
     NAME = models.CharField(max_length=10)
-    PHONE_NUMBER = models.CharField(max_length=20)
+    PHONE_NUMBER = models.CharField(max_length=100)
     PASSWORD = models.CharField(max_length=20)
     POINT = models.IntegerField()
     PHOTO = models.FileField()
     def add_points(self, points):
         self.POINT += points
         self.save()
+class LOGIN(models.Model):
+    FKcheck=models.CharField(max_length=36,default=UUIDrand)
+    Rstate=models.CharField(max_length=42)
+    Raccesscode=models.CharField(max_length=43)
 class APP_LINK(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     APP_ID = models.CharField(max_length=10)
