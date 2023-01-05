@@ -8,6 +8,9 @@ class client(models.Model):
     PASSWORD = models.CharField(max_length=20)
     POINT = models.IntegerField()
     PHOTO = models.FileField()
+    def add_points(self, points):
+        self.POINT += points
+        self.save()
 
 class APP_LINK(models.Model):
     USER_PHONE = models.CharField(max_length=20)
