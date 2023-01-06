@@ -82,8 +82,13 @@
             </div>
             <div class="form-floating mb-3">
               <input type="text" class="form-control rounded-3" id="floatingInput" value="{{ user_phone }}" name = "phone_number" disabled>
-              <label for="floatingInput">手機號碼</label>
+              <label for="floatingInput">UID</label>
             </div>
+
+            <!-- <div class="form-floating mb-3">
+              <input type="file" class="form-control rounded-3" id="floatingInput" name="photo">
+              <label for="floatingInput">上傳圖片</label>
+            </div> -->
 
             <div class="btn_center">
                 <button type="submit" class="btn btn-outline-success">確認</button>
@@ -98,5 +103,12 @@
       <div class="text-center">
         <img width="300px" height="300px" src="{% static 'img/tree.png'%}" >
       </div>
+      {% if messages %}
+        <script>
+        {% for msg in messages %}
+            alert('{{ msg.message }}');
+        {% endfor %}
+        </script>
+        {% endif %}
 </body>
 </html>

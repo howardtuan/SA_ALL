@@ -69,8 +69,11 @@
         <div class="modal-content rounded-4 shadow card_block" id="modal-content">
           <div class="modal-body p-5 ">
             <div class="text-center">
-              
+              {% if request.user.is_authenticated %}
+              <img width="150px" src="{{ getpic }}" class="pic">
+              {% else %}
               <img width="150px" src="{% static 'img/man.png'%}" class="pic">
+              {% endif %}
             </div>
             <h2 class="fw-bold mb-0 text-center">{{user_name}}</h2>
             <p class="text-center">碳權點數：{{user_point}}</p>
@@ -89,5 +92,12 @@
         
         <img width="300px" height="300px" src="{% static 'img/tree.png'%}" >
       </div>
+      {% if messages %}
+        <script>
+        {% for msg in messages %}
+            alert('{{ msg.message }}');
+        {% endfor %}
+        </script>
+        {% endif %}
 </body>
 </html>

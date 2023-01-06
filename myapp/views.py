@@ -16,11 +16,34 @@ import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
 import random
+from django.core.files.storage import FileSystemStorage
+
 # from django.utils.timezone import activate
 # activate(settings.TIME_ZONE)
 # Create your views here.
-SACCngrok="https://04d4-1-34-54-152.jp.ngrok.io"
-serverngrok="https://e9d2-111-251-54-247.ngrok.io"
+SACCngrok="https://d9a6-1-34-54-152.jp.ngrok.io"
+serverngrok="https://0938-111-251-52-199.ngrok.io"
+
+def access(request):
+    results=client.objects.filter(PHONE_NUMBER = request.user)
+    ac_code=''
+    for result in results:
+        ac_code = result.AC_CODE
+    url2=SACCngrok+'/RESTapiApp/Access/?Raccess_code='+ac_code
+    req2=requests.get(url2,headers = {'Authorization': 'Token fc350dd19927a48ed595b15586c7ea616c88a280','ngrok-skip-browser-warning': '7414'})
+    
+    req_read2 = req2.json()
+    print(type(req2.status_code))
+    if (req2.status_code!=200):
+        print("================================")
+        messages.error(request, '存取權已過期，請重新登入')
+        logout(request)
+    else:
+    
+        pic=req_read2["sPictureUrl"]
+
+        return pic
+
 def main(request):
     if request.user.is_authenticated:
         # account = "888"
@@ -30,6 +53,8 @@ def main(request):
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
         user_photo = user.PHOTO
+        user_myphoto = user.MYPHOTO
+        getpic=access(request)
     return render(request, 'index.html', locals())
 
 def index_view(request):
@@ -41,6 +66,8 @@ def index_view(request):
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
         user_photo = user.PHOTO
+        user_myphoto = user.MYPHOTO
+        getpic=access(request)
     return render(request, 'index.html', locals())
 
 
@@ -127,10 +154,20 @@ def fix2_view(request):
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
 
+@csrf_exempt
 def fix2(request):
     user_name = request.POST.get('username')
     user_phone = request.POST.get("phone_number")
     client.objects.filter(PHONE_NUMBER = request.user).update(NAME = user_name)
+    # if 'photo' in request.FILES:
+    #     file = request.FILES['photo']
+    #     fs = FileSystemStorage(location='static/pic')
+    #     filename = fs.save(file.name, file)
+    #     uploaded_file_url = fs.url(filename)
+    #     print("1")
+    #     # 更新模型的文件字段 my_code.save("static/barcode/" + phone_number)
+    #     client.objects.filter(PHONE_NUMBER = user_phone).update(MYPHOTO = uploaded_file_url)
+
     messages.error(request, '會員資料已更新')
     return HttpResponseRedirect("/member/")
 
@@ -164,8 +201,8 @@ def login2_view(request):
     # print(rand.FKcheck)
     # print(type(rand.FKcheck))
     url = SACCngrok+'/RESTapiApp/Line_1/?Rbackurl='+serverngrok+'/api2/?fk='+rand.FKcheck
-    req=requests.get(url,headers = {'Authorization': 'Token 3448dc4394fd90836d9c0f1bb5341c5881ba5b74','ngrok-skip-browser-warning': '7414'})
-    # print(req.json())
+    req=requests.get(url,headers = {'Authorization': 'Token fc350dd19927a48ed595b15586c7ea616c88a280','ngrok-skip-browser-warning': '7414'})
+    print(req.json())
     req_read = req.json()
     print(req_read["Rstate"])
     LOGIN.objects.filter(FKcheck = rand.FKcheck).update(Rstate=req_read["Rstate"])
@@ -181,11 +218,14 @@ def api2(request):
         for i in nomatter:
             sum=i.Rstate
     url = SACCngrok+'/RESTapiApp/Line_2/?Rstate='+sum
-    req=requests.get(url,headers = {'Authorization': 'Token 3448dc4394fd90836d9c0f1bb5341c5881ba5b74','ngrok-skip-browser-warning': '7414'})
+    req=requests.get(url,headers = {'Authorization': 'Token fc350dd19927a48ed595b15586c7ea616c88a280','ngrok-skip-browser-warning': '7414'})
     req_read = req.json()
+    print(req_read)
     userUID=req_read["RuserID"]
-    req_read["Raccess_code"]
-    return login2(request,userUID)
+    access_code=req_read["Raccess_code"]
+    print(req_read["Raccess_code"])
+
+    return login2(request,userUID,access_code)
     
 
     
@@ -197,6 +237,7 @@ def member_view(request):
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
         user_photo = user.PHOTO
+        getpic=access(request)
         return render(request, 'member.html', locals())
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -431,7 +472,7 @@ def signup2_view(request):
     return render(request, 'signup2.html', locals())
 def logout(request):
     auth.logout(request)
-    return HttpResponseRedirect('/index/')
+    return HttpResponseRedirect('/login2/')
 
 #註冊
 def signup(request):
@@ -466,7 +507,7 @@ def signup2(request):
 
 
 
-def login2(request,uid):
+def login2(request,uid,access_code):
     if request.user.is_authenticated:
         print("is auth")
         return HttpResponseRedirect('/index/')
@@ -480,7 +521,7 @@ def login2(request,uid):
         for i in range(10):
             codenum+=str(random.randint(0,9))
         my_code = EAN13(codenum.zfill(13), writer=ImageWriter())#code編碼要改
-        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone))
+        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone),AC_CODE=access_code)
         User.objects.create_user(username = userphone, password = '123') # 驗證的資料庫
         password = 123#(所有人都一樣)
         user = auth.authenticate(username = userphone, password = password)
@@ -501,6 +542,7 @@ def login2(request,uid):
     if user is not None and user.is_active:
         print(user)
         print('user.is_active')
+        client.objects.filter(PHONE_NUMBER = userphone).update(AC_CODE = access_code)
         auth.login(request, user)
         return HttpResponseRedirect('/index/')
     else:

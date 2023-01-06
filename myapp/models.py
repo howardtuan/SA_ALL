@@ -10,6 +10,8 @@ class client(models.Model):
     PASSWORD = models.CharField(max_length=20)
     POINT = models.IntegerField()
     PHOTO = models.FileField()
+    MYPHOTO = models.FileField()
+    AC_CODE = models.CharField(max_length=43)
     def add_points(self, points):
         self.POINT += points
         self.save()
