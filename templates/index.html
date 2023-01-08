@@ -76,12 +76,14 @@
               {% endif %}
             </div>
             <h2 class="fw-bold mb-0 text-center">{{user_name}}</h2>
-            <p class="text-center">碳權點數：{{user_point}}</p>
+            <p class="text-center">碳權點數：{{user_point}} </p>
+            
             <div class="text-center">
               
               {% comment %} <img width="200px" height="85px" src="{% static 'img/NYKD54.png'%}" > {% endcomment %}
               {% if request.user.is_authenticated %}
               <img width="200px" height="85px" src="../{{ user_photo }}" >
+              <p class="text-center">碳排放量：{{user_tan}}</p>
               {% endif %}
             </div>
             {% comment %} <p class="text-center">碳權載具：{{user_barcode}}</p> {% endcomment %}

@@ -21,8 +21,8 @@ from django.core.files.storage import FileSystemStorage
 # from django.utils.timezone import activate
 # activate(settings.TIME_ZONE)
 # Create your views here.
-SACCngrok="https://d9a6-1-34-54-152.jp.ngrok.io"
-serverngrok="https://0938-111-251-52-199.ngrok.io"
+SACCngrok="https://10eb-1-34-54-152.jp.ngrok.io"
+serverngrok="https://315c-111-251-2-13.ngrok.io"
 
 def access(request):
     results=client.objects.filter(PHONE_NUMBER = request.user)
@@ -41,6 +41,7 @@ def access(request):
     else:
     
         pic=req_read2["sPictureUrl"]
+        print(pic)
 
         return pic
 
@@ -53,7 +54,8 @@ def main(request):
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
         user_photo = user.PHOTO
-        user_myphoto = user.MYPHOTO
+        # user_myphoto = user.MYPHOTO
+        user_tan=user.TANPI
         getpic=access(request)
     return render(request, 'index.html', locals())
 
@@ -66,7 +68,8 @@ def index_view(request):
         user_point=user.POINT
         user_barcode=user.PHONE_NUMBER
         user_photo = user.PHOTO
-        user_myphoto = user.MYPHOTO
+        # user_myphoto = user.MYPHOTO
+        user_tan=user.TANPI
         getpic=access(request)
     return render(request, 'index.html', locals())
 
@@ -88,20 +91,23 @@ def exchange_view(request):
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
 
+@csrf_exempt
 def exchange(request):
     if request.user.is_authenticated:
         user_phone = request.user
         user = client.objects.get(PHONE_NUMBER = user_phone)
         user_point = user.POINT
+        user_tanpi = user.TANPI
         item_id = request.POST.get("item_id")
         item_name = request.POST.get("item_name")
         item_cost = int(request.POST.get("item_cost"))
+        item_tanpi = int(request.POST.get("item_tanpi"))
         if user_point < item_cost:
             messages.error(request, '您的點數需大於兌換點數！')
             return HttpResponseRedirect("/exchange/")
         
-        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost))
-        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False)
+        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost),TANPI=(user_tanpi+item_tanpi))
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False,TANPI=item_tanpi)
         messages.error(request, '兌換成功')
         return HttpResponseRedirect("/exchange/")
     else:
@@ -390,7 +396,7 @@ def tickets_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
-
+@csrf_exempt
 def use_ticket(request):
     if request.user.is_authenticated:
         item_id = request.POST.get("item_id")
@@ -424,22 +430,22 @@ def drive(request):
                 #沒用過
         start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-        DRIVE.objects.create(USER_PHONE = user_phone, NAME = 'DriveCar', TIME=start_timestruct, USING=True)
+        DRIVE.objects.create(USER_PHONE = user_phone, NAME = 'DriveCar', TIME=start_timestruct, USING=True,TANPI=0)
         return HttpResponseRedirect("/tickets/")
     elif DRIVE.objects.get(USER_PHONE = user_phone).USING==False:
                 #用過
         start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-        DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True)
+        DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True,TANPI=0)
         return HttpResponseRedirect("/tickets/")
     return HttpResponseRedirect("/tickets/")
-
+@csrf_exempt
 def drive_over(request):
     if request.user.is_authenticated:
         user_phone = request.user
         user = client.objects.get(PHONE_NUMBER = user_phone)
         user_point=user.POINT
-        DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False)
+        
         # DRIVE.objects.get(USER_PHONE = user_phone).USING=False
         overtime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         starttime=str(DRIVE.objects.get(USER_PHONE = user_phone).TIME+timedelta(hours=8))[0:19]
@@ -455,9 +461,10 @@ def drive_over(request):
             while total_time>30*i:
                 i+=1
             cost=2000*i
+        DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False,TANPI=total_time*100)
         #存入資料庫
-        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - cost))
-        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = cost, ITEM_ID = 87, DATE = datetime.now(), ITEM_NAME = '駕駛瑪莎拉蒂', USED = True)
+        client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - cost),TANPI=(user.TANPI+(total_time*100)))
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = cost, ITEM_ID = 87, DATE = datetime.now(), ITEM_NAME = '駕駛瑪莎拉蒂', USED = True,TANPI=total_time*100)
         return HttpResponseRedirect("/tickets/")
     else:
         messages.error(request, '您尚未登入，請先登入')
@@ -521,7 +528,7 @@ def login2(request,uid,access_code):
         for i in range(10):
             codenum+=str(random.randint(0,9))
         my_code = EAN13(codenum.zfill(13), writer=ImageWriter())#code編碼要改
-        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone),AC_CODE=access_code)
+        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone),AC_CODE=access_code,TANPI=0)
         User.objects.create_user(username = userphone, password = '123') # 驗證的資料庫
         password = 123#(所有人都一樣)
         user = auth.authenticate(username = userphone, password = password)
