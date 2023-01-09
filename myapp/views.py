@@ -22,7 +22,7 @@ from django.core.files.storage import FileSystemStorage
 # activate(settings.TIME_ZONE)
 # Create your views here.
 SACCngrok="https://10eb-1-34-54-152.jp.ngrok.io"
-serverngrok="https://315c-111-251-2-13.ngrok.io"
+serverngrok="https://c1d9-2402-7500-4e5-f8b4-2594-c234-23a-a0c2.ngrok.io"
 
 def access(request):
     results=client.objects.filter(PHONE_NUMBER = request.user)
@@ -425,20 +425,24 @@ def drive(request):
     user_phone = request.user
     user = client.objects.get(PHONE_NUMBER = user_phone)
     user_point=user.POINT
-    count = DRIVE.objects.filter(USER_PHONE = user_phone).count()
-    if count==0:
-                #沒用過
-        start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-        DRIVE.objects.create(USER_PHONE = user_phone, NAME = 'DriveCar', TIME=start_timestruct, USING=True,TANPI=0)
+    if user_point<2000:
+        messages.error(request, '點數不足2000!')
         return HttpResponseRedirect("/tickets/")
-    elif DRIVE.objects.get(USER_PHONE = user_phone).USING==False:
-                #用過
-        start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-        DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True,TANPI=0)
+    else:
+        count = DRIVE.objects.filter(USER_PHONE = user_phone).count()
+        if count==0:
+                    #沒用過
+            start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+            DRIVE.objects.create(USER_PHONE = user_phone, NAME = 'DriveCar', TIME=start_timestruct, USING=True,TANPI=0)
+            return HttpResponseRedirect("/tickets/")
+        elif DRIVE.objects.get(USER_PHONE = user_phone).USING==False:
+                    #用過
+            start=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            start_timestruct = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+            DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True,TANPI=0)
+            return HttpResponseRedirect("/tickets/")
         return HttpResponseRedirect("/tickets/")
-    return HttpResponseRedirect("/tickets/")
 @csrf_exempt
 def drive_over(request):
     if request.user.is_authenticated:
@@ -528,7 +532,7 @@ def login2(request,uid,access_code):
         for i in range(10):
             codenum+=str(random.randint(0,9))
         my_code = EAN13(codenum.zfill(13), writer=ImageWriter())#code編碼要改
-        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=0,PHOTO = my_code.save("static/barcode/" + userphone),AC_CODE=access_code,TANPI=0)
+        client.objects.create(PHONE_NUMBER = userphone, PASSWORD='123', POINT=10000,PHOTO = my_code.save("static/barcode/" + userphone),AC_CODE=access_code,TANPI=0)
         User.objects.create_user(username = userphone, password = '123') # 驗證的資料庫
         password = 123#(所有人都一樣)
         user = auth.authenticate(username = userphone, password = password)

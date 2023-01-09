@@ -21,6 +21,7 @@ class LOGIN(models.Model):
     FKcheck=models.CharField(max_length=36,default=UUIDrand)
     Rstate=models.CharField(max_length=42)
     Raccesscode=models.CharField(max_length=43)
+
 class APP_LINK(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     APP_ID = models.CharField(max_length=10)
