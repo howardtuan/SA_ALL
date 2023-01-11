@@ -3,6 +3,7 @@ from django.utils import timezone
 import uuid
 def UUIDrand():
     return str(uuid.uuid4())
+
 # Create your models here.
 class client(models.Model):
     NAME = models.CharField(max_length=10)
@@ -17,6 +18,7 @@ class client(models.Model):
         self.POINT += points
         self.TANPI += tanpis
         self.save()
+
 class LOGIN(models.Model):
     FKcheck=models.CharField(max_length=36,default=UUIDrand)
     Rstate=models.CharField(max_length=42)
@@ -50,9 +52,20 @@ class EXCHANGE_ITEM(models.Model):
     NAME = models.CharField(max_length=20)
     COST = models.IntegerField()
     TANPI = models.IntegerField()
+
 class DRIVE(models.Model):
     USER_PHONE = models.CharField(max_length=20)
     NAME = models.CharField(max_length=20)
     TIME = models.DateTimeField()
     USING = models.BooleanField()
     TANPI = models.IntegerField()
+
+class PASSBOOK(models.Model):
+    USER_PHONE = models.CharField(max_length = 20)
+    APP_ID = models.CharField(max_length=10)
+    DATE = models.DateTimeField()
+    POINT = models.IntegerField()
+    DETAIL = models.CharField(max_length = 50)
+    TANPI = models.IntegerField()
+    isHISTORY = models.BooleanField()
+    REMAIN = models.IntegerField()
