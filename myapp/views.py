@@ -107,7 +107,8 @@ def exchange(request):
             return HttpResponseRedirect("/exchange/")
         
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost),TANPI=(user_tanpi+item_tanpi))
-        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False,TANPI=item_tanpi)
+        EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False,TANPI = item_tanpi)
+        PASSBOOK.objects.create(user_phone, "None", datetime.now(), item_cost, item_name, item_tanpi, False)
         messages.error(request, '兌換成功')
         return HttpResponseRedirect("/exchange/")
     else:
@@ -198,8 +199,6 @@ def history_otherAPP_view(request):
 
 def login_view(request):
     return render(request, 'login.html', locals())
-
-
 
 def login2_view(request):
     sum=""
@@ -396,6 +395,7 @@ def tickets_view(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
+
 @csrf_exempt
 def use_ticket(request):
     if request.user.is_authenticated:
@@ -443,6 +443,7 @@ def drive(request):
             DRIVE.objects.filter(USER_PHONE = user_phone).update(TIME = start_timestruct, USING=True,TANPI=0)
             return HttpResponseRedirect("/tickets/")
         return HttpResponseRedirect("/tickets/")
+
 @csrf_exempt
 def drive_over(request):
     if request.user.is_authenticated:
@@ -479,8 +480,10 @@ def question_view(request):
 
 def signup_view(request):
     return render(request, 'signup.html', locals())
+
 def signup2_view(request):
     return render(request, 'signup2.html', locals())
+
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/login2/')
@@ -515,8 +518,6 @@ def signup2(request):
     else:
         messages.error(request, '您尚未登入，請先登入')
         return HttpResponseRedirect("/login2/")
-
-
 
 def login2(request,uid,access_code):
     if request.user.is_authenticated:
@@ -587,6 +588,7 @@ def login(request):
         print(user)
         print('user.n_active')
         return render(request, 'login.html', locals())
+
 def login_session(request):
     SA_CC_ID = request.GET.get('SA_CC_ID')
     if 'UserID' in request.session:

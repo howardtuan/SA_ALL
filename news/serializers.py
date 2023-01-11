@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 from .models import Article
-from myapp.models import HISTORY,client
+from myapp.models import HISTORY, client, PASSBOOK
 
 class HistorySerializer(serializers.ModelSerializer):
   # id = serializers.CharField(source='USER_PHONE')
@@ -12,11 +12,19 @@ class HistorySerializer(serializers.ModelSerializer):
     
   def create(self, validated_data):
     client_id = validated_data.get('USER_PHONE')
+    app_id = validated_data.get('APP_ID')
+    date = validated_data.get('DATE')
     points = validated_data.get('POINT')
+    detail = validated_data.get('DETAIL')
     tanpis = validated_data.get('TANPI')
+    
+    PASSBOOK.objects.create(client_id, app_id, date, points, detail, tanpis, True)
     # count = client.objects.filter(USER_PHONE = client_id).count()
-  
+
     member = client.objects.get(PHONE_NUMBER = client_id)
     member.add_points(points,tanpis)
 
+    
+    
+    
     return super().create(validated_data)
