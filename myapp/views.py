@@ -22,7 +22,7 @@ from django.core.files.storage import FileSystemStorage
 # activate(settings.TIME_ZONE)
 # Create your views here.
 SACCngrok="https://10eb-1-34-54-152.jp.ngrok.io"
-serverngrok="https://b6a3-116-241-164-67.ngrok.io"
+serverngrok="https://c2cb-1-171-118-240.jp.ngrok.io"
 
 def access(request):
     results=client.objects.filter(PHONE_NUMBER = request.user)

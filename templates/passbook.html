@@ -42,6 +42,7 @@
               <li><a class="dropdown-item" href="../member/">會員資料</a></li>
               <li><a class="dropdown-item" href="../history/">兌換紀錄</a></li>
               <li><a class="dropdown-item" href="../history_otherAPP/">消費紀錄</a></li>
+              <li><a class="dropdown-item" href="../passbook/">碳權存摺</a></li>
             </ul>
           </li>
           <li class="nav-item">
@@ -76,7 +77,7 @@
         <th scope="col">日期</th>
         <th scope="col">品項</th>
         <th scope="col">收入</th>
-        <th scope="col">費用</th>
+        <th scope="col">支出</th>
         <th scope="col">餘額</th>
       </tr>
     </thead>
@@ -84,18 +85,18 @@
       {% for item in list %}
         {% if item.isHISTORY%}
       <tr>
-        <th scope="row">2023/1/1</th>
-        <td>KTV兌換券</td>
+        <th scope="row">{{ item.DATE }}</th>
+        <td>{{ item.APP_ID }}-{{ item.DETAIL }}</td>
+        <td>{{ item.POINT }}</td>
         <td></td>
-        <td>500</td>
-        <td>0</td>
+        <td>{{ item.REMAIN }}</td>
       </tr>
         {% else %}
       <tr>
         <th scope="row">{{ item.DATE }}</th>
         <td>{{ item.DETAIL }}</td>
-        <td>{{ item.POINT }}</td>
         <td></td>
+        <td>{{ item.POINT }}</td>
         <td>{{ item.REMAIN }}</td>
       </tr>
         {% endif %}

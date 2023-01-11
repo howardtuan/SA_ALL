@@ -21,8 +21,7 @@ class HistorySerializer(serializers.ModelSerializer):
     # count = client.objects.filter(USER_PHONE = client_id).count()
 
     member = client.objects.get(PHONE_NUMBER = client_id)
-    member.add_points(points,tanpis)
     PASSBOOK.objects.create(USER_PHONE = client_id, APP_ID = app_id, DATE = date, POINT = points, DETAIL = detail, TANPI = tanpis, isHISTORY = True, REMAIN = member.POINT + points)
-    
+    member.add_points(points,tanpis)
     
     return super().create(validated_data)
