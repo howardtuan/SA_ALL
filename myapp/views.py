@@ -460,14 +460,15 @@ def drive_over(request):
         total_time = int(total_seconds / 60)
         print("spent time",total_time)
         if total_time <= 30:
-            cost=2000
+            cost = 2000
         else:
-            i=1
-            while total_time>30*i:
-                i+=1
-            cost=2000*i
-        DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False,TANPI=total_time*100)
+            i = 1
+            while total_time > 30 * i:
+                i += 1
+            cost = 2000 * i
+        DRIVE.objects.filter(USER_PHONE = user_phone).update(USING=False,TANPI= total_time * 100)
         #存入資料庫
+        PASSBOOK.objects.create(USER_PHONE = user_phone, APP_ID = "None", DATE = datetime.now(), POINT = cost, DETAIL = "駕駛瑪莎拉蒂" + str(total_time) + "分鍾", TANPI = total_time * 100, isHISTORY = False, REMAIN = user_point - cost)
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - cost),TANPI=(user.TANPI+(total_time*100)))
         EXCHANGE.objects.create(USER_PHONE = user_phone, COST = cost, ITEM_ID = 87, DATE = datetime.now(), ITEM_NAME = '駕駛瑪莎拉蒂', USED = True,TANPI=total_time*100)
         return HttpResponseRedirect("/tickets/")
