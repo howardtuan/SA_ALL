@@ -82,7 +82,11 @@
               
               {% comment %} <img width="200px" height="85px" src="{% static 'img/NYKD54.png'%}" > {% endcomment %}
               {% if request.user.is_authenticated %}
-              <img width="200px" height="85px" src="../{{ user_photo }}" >
+                {% if user_photo == None %}
+                  <img width="200px" height="85px" src="{% static 'img/NYKD54.png'%}" >
+                {% else %}
+                  <img width="200px" height="85px" src="../{{ user_photo }}" >
+                {% endif %}
               <p class="text-center">碳排放量：{{user_tan}}</p>
               {% endif %}
             </div>

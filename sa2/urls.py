@@ -48,7 +48,8 @@ urlpatterns = [
     path('login_process2/', views.login2),
     path("logout/", views.logout),
     path("SA_ALL/news/", include("news.urls")),
-    path("api2/",views.api2)
+    path("api2/",views.api2),
+    path('passbook/', views.passbook_view)
     # path(r'^admin/', admin.site.urls),
     # path(r'^$', sayhello),
 ]

@@ -106,9 +106,11 @@ def exchange(request):
             messages.error(request, '您的點數需大於兌換點數！')
             return HttpResponseRedirect("/exchange/")
         
+        member = client.objects.get(PHONE_NUMBER = request.user)
+        PASSBOOK.objects.create(USER_PHONE = user_phone, APP_ID = "None", DATE = datetime.now(), POINT = item_cost, DETAIL = item_name, TANPI = item_tanpi, isHISTORY = False, REMAIN = member.POINT - item_cost)
         client.objects.filter(PHONE_NUMBER = request.user).update(POINT = (user_point - item_cost),TANPI=(user_tanpi+item_tanpi))
         EXCHANGE.objects.create(USER_PHONE = user_phone, COST = item_cost, ITEM_ID = item_id, DATE = datetime.now(), ITEM_NAME = item_name, USED = False,TANPI = item_tanpi)
-        PASSBOOK.objects.create(user_phone, "None", datetime.now(), item_cost, item_name, item_tanpi, False)
+        
         messages.error(request, '兌換成功')
         return HttpResponseRedirect("/exchange/")
     else:
@@ -231,9 +233,7 @@ def api2(request):
     print(req_read["Raccess_code"])
 
     return login2(request,userUID,access_code)
-    
 
-    
 def member_view(request):
     if request.user.is_authenticated:
         user_phone = request.user
@@ -600,3 +600,7 @@ def login_session(request):
     request.session.modified = True
     request.session.set_expiry(60*20) #存在20分鐘
     return HttpResponseRedirect('inside.html')
+
+def passbook_view(request):
+    list = PASSBOOK.objects.filter(USER_PHONE = request.user).order_by('-DATE').all()
+    return render(request, 'passbook.html', locals())

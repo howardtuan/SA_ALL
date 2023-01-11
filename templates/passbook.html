@@ -81,6 +81,8 @@
       </tr>
     </thead>
     <tbody>
+      {% for item in list %}
+        {% if item.isHISTORY%}
       <tr>
         <th scope="row">2023/1/1</th>
         <td>KTV兌換券</td>
@@ -88,13 +90,16 @@
         <td>500</td>
         <td>0</td>
       </tr>
+        {% else %}
       <tr>
-        <th scope="row">2023/1/2</th>
-        <td>AI智慧喜</td>
-        <td>60</td>
+        <th scope="row">{{ item.DATE }}</th>
+        <td>{{ item.DETAIL }}</td>
+        <td>{{ item.POINT }}</td>
         <td></td>
-        <td>560</td>
+        <td>{{ item.REMAIN }}</td>
       </tr>
+        {% endif %}
+      {% endfor %}
     </tbody>
   
     </table>
